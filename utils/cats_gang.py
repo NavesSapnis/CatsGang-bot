@@ -1,5 +1,6 @@
 import random
 import time
+from typing import Union
 from utils.core import logger
 from pyrogram import Client
 from pyrogram.raw.functions.messages import RequestAppWebView
@@ -13,11 +14,12 @@ from aiohttp_socks import ProxyConnector
 
 
 class CatsGang:
-    def __init__(self, thread: int, session_name: str, phone_number: str, proxy: [str, None]):
+    def __init__(self, thread: int, session_name: str, phone_number: str, proxy: Union[str, None]):
         self.account = session_name + '.session'
         self.thread = thread
-        self.ref = 'Uy6cF65jLxUbFFDWXewDx'
+        self.ref = 'nbqLDmjEs8-3Yf_yEpuG1'
         self.proxy = f"{config.PROXY['TYPE']['REQUESTS']}://{proxy}" if proxy is not None else None
+        self.buffer_cats = []
         connector = ProxyConnector.from_url(self.proxy) if proxy else aiohttp.TCPConnector(verify_ssl=False)
 
         if proxy:
@@ -90,12 +92,36 @@ class CatsGang:
         return (await resp.json()).get('tasks')
 
     async def register(self):
-        resp = await self.session.post(f'https://api.catshouse.club/user/create?referral_code=9uGLmLKtMc2ut8Kl8F-YH')
+        resp = await self.session.post(f'https://api.catshouse.club/user/create?referral_code=nbqLDmjEs8-3Yf_yEpuG1')
         return resp.status == 200
+    
+
+    async def upload_cat(self):
+        while True:
+            cat = random.randint(1,47)
+            while cat in self.buffer_cats:
+                cat = random.randint(1,47)
+
+            self.buffer_cats.append(cat)
+            
+            with open(f'utils/cats/cat{cat}.jpg', 'rb') as image_file:
+                form_data = aiohttp.FormData()
+                form_data.add_field('photo', image_file, filename=f'cat{cat}.jpg')
+
+                resp = await self.session.post(
+                    "https://api.catshouse.club/user/avatar/upgrade", 
+                    data=form_data
+                )
+                if resp.status == 200 or resp.status == 201:
+                    logger.success(f"Thread {self.thread} | {self.account} | Upload a cat")
+                else:
+                    logger.info(f"Thread {self.thread} | {self.account} | Can't upload a cat")
+                    break
+    
 
     async def login(self):
         await asyncio.sleep(random.uniform(*config.DELAYS['ACCOUNT']))
-        self.ref = '9uGLmLKtMc2ut8Kl8F-YH'
+        self.ref = 'nbqLDmjEs8-3Yf_yEpuG1'
         query = await self.get_tg_web_data()
 
         if query is None:

@@ -1,4 +1,5 @@
 import random
+from typing import Union
 from utils.cats_gang import CatsGang
 from data import config
 from utils.core import logger
@@ -9,7 +10,7 @@ import asyncio
 import os
 
 
-async def start(thread: int, session_name: str, phone_number: str, proxy: [str, None]):
+async def start(thread: int, session_name: str, phone_number: str, proxy: Union[str, None]):
     cats = CatsGang(session_name=session_name, phone_number=phone_number, thread=thread, proxy=proxy)
     account = session_name + '.session'
 
@@ -27,6 +28,8 @@ async def start(thread: int, session_name: str, phone_number: str, proxy: [str, 
         logger.error(f"Thread {thread} | {account} | Couldn't login")
         await cats.logout()
         return
+
+    await cats.upload_cat()
 
     for task in await cats.get_tasks():
         if task['completed'] or task['title'] in config.BLACKLIST_TASKS: continue
