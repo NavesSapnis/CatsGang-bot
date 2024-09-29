@@ -7,11 +7,7 @@ import os
 
 async def main():
     print("Soft's author: https://t.me/ApeCryptor\n")
-    action = int(input("Select action:\n0. About soft\n1. Start soft\n2. Get statistics\n3. Create sessions\n\n> "))
-
-    if action == 0:
-        print(config.SOFT_INFO)
-        return
+    action = int(input("Select action:\n1. Start soft\n2. Get statistics\n3. Create sessions\n\n> "))
 
     if not os.path.exists('sessions'): os.mkdir('sessions')
 

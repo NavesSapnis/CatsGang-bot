@@ -30,25 +30,31 @@ async def start(thread: int, session_name: str, phone_number: str, proxy: Union[
         return
 
     await cats.upload_cat()
+    
+    if config.TASKS:
+        while True:
+            try:
+                for task in await cats.get_tasks():
+                    if task['completed'] or task['title'] in config.BLACKLIST_TASKS: continue
 
-    for task in await cats.get_tasks():
-        if task['completed'] or task['title'] in config.BLACKLIST_TASKS: continue
+                    if task['type'] == 'OPEN_LINK':
+                        if await cats.complete_task(task_id=task['id']):
+                            logger.success(f"Thread {thread} | {account} | Completed task «{task['title']}» and got {task['rewardPoints']} CATS")
+                        else:
+                            logger.warning(f"Thread {thread} | {account} | Couldn't complete task «{task['title']}»")
 
-        if task['type'] == 'OPEN_LINK':
-            if await cats.complete_task(task_id=task['id']):
-                logger.success(f"Thread {thread} | {account} | Completed task «{task['title']}» and got {task['rewardPoints']} CATS")
-            else:
-                logger.warning(f"Thread {thread} | {account} | Couldn't complete task «{task['title']}»")
+                    elif task['type'] == 'SUBSCRIBE_TO_CHANNEL' and task['allowCheck']:
+                        if await cats.check_task(task_id=task['id']):
+                            logger.success(f"Thread {thread} | {account} | Completed task «{task['title']}» and got {task['rewardPoints']} CATS")
+                        else:
+                            logger.warning(f"Thread {thread} | {account} | Couldn't complete task «{task['title']}»")
 
-        elif task['type'] == 'SUBSCRIBE_TO_CHANNEL' and task['allowCheck']:
-            if await cats.check_task(task_id=task['id']):
-                logger.success(f"Thread {thread} | {account} | Completed task «{task['title']}» and got {task['rewardPoints']} CATS")
-            else:
-                logger.warning(f"Thread {thread} | {account} | Couldn't complete task «{task['title']}»")
-
-        else:
-            continue
-        await asyncio.sleep(random.uniform(*config.DELAYS['TASK']))
+                    else:
+                        continue
+                    await asyncio.sleep(random.uniform(*config.DELAYS['TASK']))
+            except:
+                continue
+        
 
     await cats.logout()
 

@@ -2,7 +2,7 @@
 API_ID = 1234
 API_HASH = '1234'
 
-
+TASKS = True
 DELAYS = {
     "RELOGIN": [5, 7],  # delay after a login attempt
     'ACCOUNT': [5, 15],  # delay between connections to accounts (the more accounts, the longer the delay)
