@@ -29,11 +29,11 @@ async def start(thread: int, session_name: str, phone_number: str, proxy: Union[
         await cats.logout()
         return
 
-    await cats.upload_cat()
     
     if config.TASKS:
         while True:
             try:
+                await cats.upload_cat()
                 for task in await cats.get_tasks():
                     if task['completed'] or task['title'] in config.BLACKLIST_TASKS: continue
 

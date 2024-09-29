@@ -115,7 +115,7 @@ class CatsGang:
                 if resp.status == 200 or resp.status == 201:
                     logger.success(f"Thread {self.thread} | {self.account} | Upload a cat")
                 else:
-                    logger.info(f"Thread {self.thread} | {self.account} | Can't upload a cat")
+                    logger.info(f"Thread {self.thread} | {self.account} | Can't upload a cat | {resp}")
                     break
     
 
